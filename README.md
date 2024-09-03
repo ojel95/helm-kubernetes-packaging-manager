@@ -51,3 +51,67 @@ Are where the charts are store and then pulled.
 
 One of the most popular public respositories is [Bitnami]("https://bitnami.com/stacks/helm"). There you can find official charts for
 different technologies.
+
+### Kube config file
+
+The env variable KUBECONFIG is the one that point to config file. You can export new values to change the file used.
+
+## Commands
+
+### Repository commands
+
+list your added repos: `helm repo list`
+
+Add a new repo: `helm repo add bitnami https://charts.bitnami.com/bitnami`
+
+Remove a repo: `helm repo remove bitnami`
+
+Update the repo: `helm repo update`
+
+**Search the repository**:
+
+Search charts in the repo: `helm search repo mysql`
+
+Search charts with all its versions: `helm search repo database --versions`
+
+### Installation
+
+Install a package: `helm install mydb bitnami/mysql`
+
+- The installation name should be unique per namespace. You can add `-n namespace_name` to install it in a different namespace
+- You can set custom configuration or values during installation (NOT RECOMMENDED) adding `--set auth.rootPassword=test1234` for example.
+- The recommended way is to use a values config file. Adding `--values path-to/values.yaml`
+
+To check the installation status: `helm status mydb`
+
+To list the installed packages: `helm list`
+
+  - You can add `-n namespace_name` to list in other namespace than default.
+
+### Uninstallation
+
+Unistall installed package: `helm uninstall mydb`
+
+  - Same as installation you can specify the namespace using `-n namespace_name`
+
+Uninstall keeping the history: `helm unistall mydb --keep-history`
+
+## Upgrade
+
+Here you can check the installation output messages in order the define if you need specific value. In the case of
+the previous examples with mysql you need to set the rootPassword value. You can do it with --set which is not the
+recommended way or with the values file.
+
+Helm is intelligent to upgrade only the resources with changes and you will see that the REVISION numbers is updated.
+
+``` bash
+helm upgrade --namespace default mysql-release bitnami/mysql --values ./path/to/values.yaml
+```
+
+Here you have to provide the same values used in installation or you can use:
+
+``` bash
+helm upgrade --namespace default mysql-release bitnami/mysql --reuse-values
+```
+
+When you do an upgrade, helm will create a new secret in the cluster and there is where it stores the release information. Check it with: `kubectl get secrets`
